@@ -49,6 +49,11 @@ dependencies {
     implementation "androidx.camera:camera-lifecycle:1.0.1"
     // CameraX View class
     implementation "androidx.camera:camera-view:1.0.0-alpha27"
-
+    // Coroutines Kotlin
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1-native-mt'
+    // Coroutines Kotlin - Android
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1-native-mt'
+    // Coroutines Kotlin - Android - Lifecycle
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.1'
 
 }
