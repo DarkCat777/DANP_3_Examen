@@ -1,4 +1,4 @@
 <resources>
-	<string name="app_name">danp3</string>
+    <string name="app_name">danp3</string>
     <string name="take_photo" />
 </resources>

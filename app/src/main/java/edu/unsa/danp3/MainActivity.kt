@@ -1,21 +1,23 @@
 package edu.unsa.danp3
 
 import android.Manifest
+import android.graphics.BitmapFactory
 import android.icu.text.SimpleDateFormat
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.widget.Button
+import android.view.MotionEvent
+import android.view.TextureView
+import android.view.View
+import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageCaptureException
-import androidx.camera.core.Preview
+import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
@@ -23,14 +25,16 @@ import java.io.File
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import android.graphics.Bitmap as Bitmap
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var activityResultLauncher: ActivityResultLauncher<String>
     private var imageCapture: ImageCapture? = null
+    private lateinit var photoView: ImageView
     private lateinit var outputDirectory: File
     private lateinit var cameraExecutor: ExecutorService
-    private lateinit var cameraCaptureButton: Button
+    private lateinit var cameraCaptureButton: ImageButton
     private lateinit var viewFinder: PreviewView
 
     companion object {
@@ -41,9 +45,10 @@ class MainActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.camera)
         cameraCaptureButton = findViewById(R.id.camera_capture_button)
         viewFinder = findViewById(R.id.view_finder)
+        photoView = findViewById(R.id.view_finder_result)
         activityResultLauncher = registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { isGranted: Boolean ->
@@ -98,7 +103,30 @@ class MainActivity : AppCompatActivity() {
                 // Unbind use cases before rebinding
                 cameraProvider.unbindAll()
                 // Bind use cases to camera
-                cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture)
+                val camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture)
+                val cameraControl = camera.cameraControl
+                viewFinder.setOnTouchListener(View.OnTouchListener setOnTouchListener@{ _: View, motionEvent: MotionEvent ->
+                    when (motionEvent.action) {
+                        MotionEvent.ACTION_DOWN -> return@setOnTouchListener true
+                        MotionEvent.ACTION_UP -> {
+                            // Get the MeteringPointFactory from PreviewView
+                            val factory = viewFinder.meteringPointFactory
+
+                            // Create a MeteringPoint from the tap coordinates
+                            val point = factory.createPoint(motionEvent.x, motionEvent.y)
+
+                            // Create a MeteringAction from the MeteringPoint, you can configure it to specify the metering mode
+                            val action = FocusMeteringAction.Builder(point).build()
+
+                            // Trigger the focus and metering. The method returns a ListenableFuture since the operation
+                            // is asynchronous. You can use it get notified when the focus is successful or if it fails.
+                            cameraControl.startFocusAndMetering(action)
+                            Log.e(TAG, "Action Execute")
+                            return@setOnTouchListener true
+                        }
+                        else -> return@setOnTouchListener false
+                    }
+                })
             } catch (exc: Exception) {
                 Log.e(TAG, "Use case binding failed", exc)
             }
@@ -129,6 +157,7 @@ class MainActivity : AppCompatActivity() {
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                     val savedUri = Uri.fromFile(photoFile)
+                    photoView.setImageBitmap(BitmapFactory.decodeFile(photoFile.absolutePath))
                     val msg = "Photo capture succeeded: $savedUri"
                     Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
                     Log.d(TAG, msg)
