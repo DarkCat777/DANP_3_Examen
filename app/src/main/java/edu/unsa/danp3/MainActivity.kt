@@ -1,6 +1,5 @@
 package edu.unsa.danp3
 
-import android.Manifest
 import android.graphics.BitmapFactory
 import android.icu.text.SimpleDateFormat
 import android.net.Uri
@@ -8,24 +7,33 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.MotionEvent
-import android.view.TextureView
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
+import edu.unsa.danp3.audio.ConsistentFrequencyDetector
+import edu.unsa.danp3.audio.LoudNoiseDetector
+import edu.unsa.danp3.audio.LoudNoiseDetectorAboveNormal
+import edu.unsa.danp3.audio.SingleClapDetector
+import edu.unsa.danp3.job.RecordAmplitudeJob
+import edu.unsa.danp3.job.RecordAudioJob
+import edu.unsa.danp3.util.AudioTaskUtil
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.job
+import kotlinx.coroutines.launch
 import java.io.File
 import java.util.*
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import android.graphics.Bitmap as Bitmap
+import kotlin.properties.Delegates
 
 class MainActivity : AppCompatActivity() {
 
@@ -33,40 +41,117 @@ class MainActivity : AppCompatActivity() {
     private var imageCapture: ImageCapture? = null
     private lateinit var photoView: ImageView
     private lateinit var outputDirectory: File
-    private lateinit var cameraExecutor: ExecutorService
-    private lateinit var cameraCaptureButton: ImageButton
+    private lateinit var btnRecordAudioCapture: ImageButton
     private lateinit var viewFinder: PreviewView
+    private lateinit var statusTV: TextView
+    private var SELECTED_DETECTOR by Delegates.notNull<Int>()
+
+    private lateinit var coroutineReference: Job
 
     companion object {
-        private const val TAG = "CameraXBasic"
+        private val TAG by lazy { MainActivity::class.simpleName }
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.camera)
-        cameraCaptureButton = findViewById(R.id.camera_capture_button)
+        btnRecordAudioCapture = findViewById(R.id.record_audio_capture_button)
         viewFinder = findViewById(R.id.view_finder)
         photoView = findViewById(R.id.view_finder_result)
-        activityResultLauncher = registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted: Boolean ->
-            if (isGranted) {
-                startCamera()
-                cameraCaptureButton.setOnClickListener { takePhoto() }
-                outputDirectory = getOutputDirectory()
-                cameraExecutor = Executors.newSingleThreadExecutor()
+        statusTV = findViewById(R.id.status_record)
+
+        SELECTED_DETECTOR = this.intent.extras!!.getInt(Menu.AUDIO_DETECTOR_EXTRA)
+
+        startCamera()
+        // Tomar fotografia con el metodo [takePhoto()]
+        outputDirectory = getOutputDirectory()
+
+        btnRecordAudioCapture.setOnClickListener {
+            // Darle a stop si la corutina esta activa, no ha sido cancelada y no ha sido completada y ademas la variable ha sido inicializada
+            if (!(this::coroutineReference.isInitialized &&
+                        !coroutineReference.isCancelled &&
+                        !coroutineReference.isCompleted) ||
+                !this::coroutineReference.isInitialized
+            ) {
+                var result = false
+                lifecycleScope.launch(Dispatchers.Main) {
+                    // Inicializar el logger
+                    val statusText = this@MainActivity.resources.getString(R.string.status) + "Grabando ..."
+                    statusTV.text = statusText
+                }
+                when (SELECTED_DETECTOR) {
+                    Menu.SINGLE_CLAP_DETECTOR -> {
+                        // Do coroutine
+                        coroutineReference = lifecycleScope.launch(Dispatchers.Default) {
+                            result = RecordAmplitudeJob.execute(
+                                this@MainActivity.getExternalFilesDir(RecordAmplitudeJob.TEMP_AUDIO_DIR_NAME)!!.absolutePath,
+                                SingleClapDetector(),
+                                this.coroutineContext.job
+                            )
+                        }
+                    }
+                    Menu.LOUD_NOISE_DETECTOR -> {
+                        // Do coroutine
+                        coroutineReference = lifecycleScope.launch(Dispatchers.Default) {
+                            result = RecordAudioJob.execute(
+                                LoudNoiseDetector(),
+                                this.coroutineContext.job
+                            )
+                        }
+                    }
+                    Menu.LOUD_NOISE_ABOVE_NORMAL_DETECTOR -> {
+                        // Do coroutine
+                        coroutineReference = lifecycleScope.launch(Dispatchers.Default) {
+                            result = RecordAudioJob.execute(
+                                LoudNoiseDetectorAboveNormal(),
+                                this.coroutineContext.job
+                            )
+                        }
+                    }
+                    Menu.CONSISTENT_FREQUENCY_DETECTOR -> {
+                        // Do coroutine
+                        coroutineReference = lifecycleScope.launch(Dispatchers.Default) {
+                            result = RecordAudioJob.execute(
+                                ConsistentFrequencyDetector(
+                                    historySize = 3,
+                                    rangeThreshold = 100,
+                                    ConsistentFrequencyDetector.DEFAULT_SILENCE_THRESHOLD
+                                ),
+                                this.coroutineContext.job
+                            )
+                        }
+                    }
+                }
+                coroutineReference.invokeOnCompletion {
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        Log.e(TAG, "RESULT: $result")
+                        if (result) {
+                            takePhoto()
+                            Toast.makeText(
+                                this@MainActivity,
+                                "Se detecto un sonido y se tomo una foto: " + AudioTaskUtil.now,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            Toast.makeText(
+                                this@MainActivity,
+                                "No se detectaron sonidos y no se tomo una foto",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        val statusText =
+                            this@MainActivity.resources.getString(R.string.status) + "Se detuvo la grabación."
+                        statusTV.text = statusText
+                    }
+                }
             } else {
-                Toast.makeText(
-                    this,
-                    "Permissions not granted by the user.",
-                    Toast.LENGTH_SHORT
-                ).show()
-                this.finish()
+                this.coroutineReference.cancel()
             }
         }
-        activityResultLauncher.launch(Manifest.permission.CAMERA)
+
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -77,11 +162,6 @@ class MainActivity : AppCompatActivity() {
         }
         return if (mediaDir != null && mediaDir.exists())
             mediaDir else filesDir
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        cameraExecutor.shutdown()
     }
 
     private fun startCamera() {

@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">danp3</string>
     <string name="take_photo" />
+	<string name="status">Status:</string>
 </resources>

@@ -17,14 +17,14 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/record"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:padding="20sp"
-            android:text="Status: "
-            android:textColor="@color/white"
-            android:textSize="20sp" />
+                android:id="@+id/status_record"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="20sp"
+                android:text="@string/status"
+                android:textColor="@color/white"
+                android:textSize="20sp" />
     </LinearLayout>
 
     <androidx.camera.view.PreviewView
@@ -57,15 +57,15 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <ImageButton
-            android:id="@+id/camera_capture_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:background="@drawable/button_rounded"
-            android:padding="15dp"
-            android:scaleType="fitCenter"
-            app:srcCompat="@drawable/ic_audio_message"
-            tools:ignore="SpeakableTextPresentCheck" />
+                android:id="@+id/record_audio_capture_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@drawable/button_rounded"
+                android:padding="15dp"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/ic_audio_message"
+                tools:ignore="SpeakableTextPresentCheck" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
