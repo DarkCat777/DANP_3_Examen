@@ -71,7 +71,7 @@ class MainActivity : AppCompatActivity() {
         // Inicializar camara
         startCamera()
         // Setteo de img al boton
-        btnRecordAudioCapture.setBackgroundResource(R.drawable.ic_audio_message)
+        btnRecordAudioCapture.setImageResource(R.drawable.ic_audio_message)
         // Setteo de operaciones al boton
         btnRecordAudioCapture.setOnClickListener {
             // Darle a stop si la corutina esta activa, no ha sido cancelada y no ha sido completada y ademas la variable ha sido inicializada
@@ -85,7 +85,7 @@ class MainActivity : AppCompatActivity() {
                     // Inicializar el logger
                     val statusText = this@MainActivity.resources.getString(R.string.status) + "Grabando ..."
                     statusTV.text = statusText
-                    btnRecordAudioCapture.setBackgroundResource(R.drawable.ic_stop)
+                    btnRecordAudioCapture.setImageResource(R.drawable.ic_stop)
                 }
                 when (SELECTED_DETECTOR) {
                     Menu.SINGLE_CLAP_DETECTOR -> {
@@ -132,7 +132,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 coroutineReference.invokeOnCompletion {
                     lifecycleScope.launch(Dispatchers.Main) {
-                        btnRecordAudioCapture.setBackgroundResource(R.drawable.ic_audio_message)
+                        btnRecordAudioCapture.setImageResource(R.drawable.ic_audio_message)
                         Log.e(TAG, "RESULT: $result")
                         if (result) {
                             takePhoto()

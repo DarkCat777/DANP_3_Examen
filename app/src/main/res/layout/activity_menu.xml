@@ -74,7 +74,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="SONIDOS"
+                    android:text="MEDIA\nRECORDER"
                     android:textAlignment="center"
                     android:textColor="@color/morado"
                     android:textSize="20dp"
@@ -111,7 +111,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="SONIDOS"
+                    android:text="MEDIA\nRECORDER"
                     android:textAlignment="center"
                     android:textColor="@color/morado"
                     android:textSize="20dp"
@@ -148,7 +148,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="SONIDOS"
+                    android:text="DETECTOR\nCON\nHISTORIAL"
                     android:textAlignment="center"
                     android:textColor="@color/morado"
                     android:textSize="19dp"
@@ -185,7 +185,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="SONIDOS"
+                    android:text="DETECTOR\nTONOS"
                     android:textAlignment="center"
                     android:textColor="@color/morado"
                     android:textSize="20dp"
