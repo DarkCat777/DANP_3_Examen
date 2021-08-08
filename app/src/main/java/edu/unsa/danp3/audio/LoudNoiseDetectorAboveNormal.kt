@@ -22,8 +22,6 @@ import kotlin.math.sqrt
 /**
  * alternative Loud Noise detector that tracks the difference between
  * the new noise and an averagre value. It might be useful in some situations.
- *
- * @author Greg Milette &#60;[gregorym@gmail.com](mailto:gregorym@gmail.com)&#62;
  */
 class LoudNoiseDetectorAboveNormal : AudioClipListener {
 

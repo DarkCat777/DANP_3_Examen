@@ -1,71 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity">
+                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                   xmlns:tools="http://schemas.android.com/tools"
+                                                   android:layout_width="match_parent"
+                                                   android:layout_height="match_parent"
+                                                   tools:context=".MainActivity">
 
-    <LinearLayout
-        android:id="@+id/linearLayout2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/black"
-        android:orientation="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+	<LinearLayout
+			android:id="@+id/linearLayout2"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:background="@color/black"
+			android:orientation="vertical"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-                android:id="@+id/status_record"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:padding="20sp"
-                android:text="@string/status"
-                android:textColor="@color/white"
-                android:textSize="20sp" />
-    </LinearLayout>
+		<TextView
+				android:id="@+id/status_record"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:gravity="center"
+				android:padding="20sp"
+				android:text="@string/status"
+				android:textColor="@color/white"
+				android:textSize="20sp"/>
+	</LinearLayout>
 
-    <androidx.camera.view.PreviewView
-        android:id="@+id/view_finder"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
-    </androidx.camera.view.PreviewView>
+	<androidx.camera.view.PreviewView
+			android:id="@+id/view_finder"
+			android:layout_width="match_parent"
+			android:layout_height="0dp"
+			app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+			app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
+	</androidx.camera.view.PreviewView>
 
-    <ImageView
-        android:id="@+id/view_finder_result"
-        android:layout_width="150dp"
-        android:layout_height="200dp"
-        android:rotation="90"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
+	<ImageView
+			android:id="@+id/view_finder_result"
+			android:layout_width="150dp"
+			android:layout_height="200dp"
+			android:rotation="90"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
 
-    </ImageView>
+	</ImageView>
 
-    <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/black"
-        android:orientation="vertical"
-        android:paddingTop="20dp"
-        android:paddingBottom="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+	<LinearLayout
+			android:id="@+id/linearLayout"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:background="@color/black"
+			android:orientation="vertical"
+			android:paddingTop="20dp"
+			android:paddingBottom="20dp"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintEnd_toEndOf="parent">
 
-        <ImageButton
-                android:id="@+id/record_audio_capture_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:background="@drawable/button_rounded"
-                android:padding="15dp"
-                android:scaleType="fitCenter"
-                app:srcCompat="@drawable/ic_audio_message"
-                tools:ignore="SpeakableTextPresentCheck" />
-    </LinearLayout>
+		<ImageButton
+				android:id="@+id/record_audio_capture_button"
+				android:layout_width="80dp"
+				android:layout_height="80dp"
+				android:layout_gravity="center"
+				android:background="@drawable/button_rounded"
+				android:padding="15dp"
+				android:scaleType="fitCenter"
+				tools:ignore="SpeakableTextPresentCheck"/>
+	</LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

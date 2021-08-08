@@ -31,13 +31,13 @@ object RecordAmplitudeJob {
                 recorder.startRecording()
             }.getOrThrow()
         } catch (io: IOException) {
-            Log.e(TAG, "failed to record", io)
+            Log.d(TAG, "failed to record", io)
             false
         } catch (se: IllegalStateException) {
-            Log.e(TAG, "failed to record, recorder not setup properly", se)
+            Log.d(TAG, "failed to record, recorder not setup properly", se)
             false
         } catch (re: RuntimeException) {
-            Log.e(TAG, "failed to record, recorder already being used", re)
+            Log.d(TAG, "failed to record, recorder already being used", re)
             false
         }
         return heard

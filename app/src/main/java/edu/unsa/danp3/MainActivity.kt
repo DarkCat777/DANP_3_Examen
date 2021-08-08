@@ -12,7 +12,6 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
@@ -37,7 +36,6 @@ import kotlin.properties.Delegates
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var activityResultLauncher: ActivityResultLauncher<String>
     private var imageCapture: ImageCapture? = null
     private lateinit var photoView: ImageView
     private lateinit var outputDirectory: File
@@ -62,13 +60,19 @@ class MainActivity : AppCompatActivity() {
         viewFinder = findViewById(R.id.view_finder)
         photoView = findViewById(R.id.view_finder_result)
         statusTV = findViewById(R.id.status_record)
-
         SELECTED_DETECTOR = this.intent.extras!!.getInt(Menu.AUDIO_DETECTOR_EXTRA)
+        initComponents()
+    }
 
-        startCamera()
+    @RequiresApi(Build.VERSION_CODES.N)
+    private fun initComponents() {
         // Tomar fotografia con el metodo [takePhoto()]
         outputDirectory = getOutputDirectory()
-
+        // Inicializar camara
+        startCamera()
+        // Setteo de img al boton
+        btnRecordAudioCapture.setBackgroundResource(R.drawable.ic_audio_message)
+        // Setteo de operaciones al boton
         btnRecordAudioCapture.setOnClickListener {
             // Darle a stop si la corutina esta activa, no ha sido cancelada y no ha sido completada y ademas la variable ha sido inicializada
             if (!(this::coroutineReference.isInitialized &&
@@ -81,6 +85,7 @@ class MainActivity : AppCompatActivity() {
                     // Inicializar el logger
                     val statusText = this@MainActivity.resources.getString(R.string.status) + "Grabando ..."
                     statusTV.text = statusText
+                    btnRecordAudioCapture.setBackgroundResource(R.drawable.ic_stop)
                 }
                 when (SELECTED_DETECTOR) {
                     Menu.SINGLE_CLAP_DETECTOR -> {
@@ -127,6 +132,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 coroutineReference.invokeOnCompletion {
                     lifecycleScope.launch(Dispatchers.Main) {
+                        btnRecordAudioCapture.setBackgroundResource(R.drawable.ic_audio_message)
                         Log.e(TAG, "RESULT: $result")
                         if (result) {
                             takePhoto()
@@ -151,7 +157,6 @@ class MainActivity : AppCompatActivity() {
                 this.coroutineReference.cancel()
             }
         }
-
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)

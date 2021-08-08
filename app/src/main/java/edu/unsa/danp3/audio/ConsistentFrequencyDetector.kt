@@ -10,8 +10,6 @@ import java.util.*
 /**
  * track a history of frequencies, and determine if a new frequency is within
  * the range of the ones in the history
- *
- * @author Greg Milette &#60;[gregorym@gmail.com](mailto:gregorym@gmail.com)&#62;
  */
 class ConsistentFrequencyDetector(
     historySize: Int, rangeThreshold: Int,
